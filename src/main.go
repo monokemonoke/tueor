@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	_ "embed"
+	"embed"
 	"go/format"
 	"html/template"
 	"log"
@@ -10,16 +10,43 @@ import (
 )
 
 var (
-	//go:embed templates/test.txt
-	testTxt string
+	//go:embed templates/helloworld/*
+	helloworld embed.FS
 )
 
 func main() {
-	t := template.Must(template.New("test").Parse(testTxt))
-	params := map[string]interface{}{
-		"message": "message from generator",
+	modTemplate, err := template.ParseFS(helloworld, "templates/helloworld/go.mod.txt")
+	if err != nil {
+		log.Fatal(err)
 	}
+	modParams := map[string]interface{}{
+		"moduleName": "example.com/monokemonoke/hoge",
+	}
+	generate(modTemplate, modParams, "test-go.mod")
 
+	mainTemplate, err := template.ParseFS(helloworld, "templates/helloworld/main.go.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	mainParams := map[string]interface{}{
+		"message": "example.com/monokemonoke/hoge",
+	}
+	generateGoCode(mainTemplate, mainParams, "test-main.go")
+}
+
+func generate(t *template.Template, params interface{}, filename string) {
+	var buf bytes.Buffer
+	t.Execute(&buf, params)
+
+	var out bytes.Buffer
+	out.Write(buf.Bytes())
+
+	if err := os.WriteFile(filename, out.Bytes(), 0644); err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func generateGoCode(t *template.Template, params interface{}, filename string) {
 	var buf bytes.Buffer
 	t.Execute(&buf, params)
 
@@ -31,7 +58,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := os.WriteFile("test.go", body, 0644); err != nil {
+	if err := os.WriteFile(filename, body, 0644); err != nil {
 		log.Fatalln(err)
 	}
 }
