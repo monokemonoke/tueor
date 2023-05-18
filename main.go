@@ -15,14 +15,15 @@ import (
 )
 
 func main() {
-	fileSystem, err := fs.Sub(src.Helloworld, src.HelloworldDir)
+	fileSystem, err := fs.Sub(src.Start, src.StartDir)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
-	fmt.Println(fileSystem)
 
-	readEntries(fileSystem, ".", src.HelloworldParams)
+	if err := readEntries(fileSystem, ".", src.StartParams); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+	}
 }
 
 func readEntries(fsys fs.FS, dirname string, params src.Params) error {
