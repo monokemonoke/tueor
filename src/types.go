@@ -2,7 +2,7 @@ package src
 
 import "embed"
 
-type Params map[string]map[string]interface{}
+type Params map[string]map[string]string
 
 type TemplateConfig struct {
 	Embed  embed.FS

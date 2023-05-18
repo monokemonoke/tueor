@@ -42,7 +42,7 @@ func readEntries(fsys fs.FS, dirname string, params Params) error {
 	return nil
 }
 
-func generate(t *template.Template, params map[string]interface{}, filename string) error {
+func generate(t *template.Template, params map[string]string, filename string) error {
 	if len(filename) < 4 {
 		return errors.New("filename is too short")
 	}
@@ -55,7 +55,7 @@ func generate(t *template.Template, params map[string]interface{}, filename stri
 	return generateText(t, params, generateFile)
 }
 
-func generateText(t *template.Template, params map[string]interface{}, filename string) error {
+func generateText(t *template.Template, params map[string]string, filename string) error {
 	var buf bytes.Buffer
 	t.Execute(&buf, params)
 
@@ -77,7 +77,7 @@ func generateText(t *template.Template, params map[string]interface{}, filename 
 	return nil
 }
 
-func generateGo(t *template.Template, params map[string]interface{}, filename string) error {
+func generateGo(t *template.Template, params map[string]string, filename string) error {
 	var buf bytes.Buffer
 	t.Execute(&buf, params)
 
