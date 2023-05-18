@@ -2,8 +2,6 @@ package main
 
 import (
 	"bytes"
-	"embed"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"go/format"
@@ -12,34 +10,22 @@ import (
 	"log"
 	"os"
 	"path"
-)
 
-var (
-	//go:embed templates/start/templates/*
-	helloworld embed.FS
-
-	//go:embed templates/start/params.json
-	helloworldParams []byte
+	"github.com/monokemonoke/tueor/src"
 )
 
 func main() {
-	fileSystem, err := fs.Sub(helloworld, "templates/start/templates")
+	fileSystem, err := fs.Sub(src.Helloworld, src.HelloworldDir)
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 	fmt.Println(fileSystem)
 
-	var params map[string]map[string]interface{}
-	if err := json.Unmarshal(helloworldParams, &params); err != nil {
-		log.Fatal(err)
-		return
-	}
-
-	readEntries(fileSystem, ".", params)
+	readEntries(fileSystem, ".", src.HelloworldParams)
 }
 
-func readEntries(fsys fs.FS, dirname string, params map[string]map[string]interface{}) error {
+func readEntries(fsys fs.FS, dirname string, params src.Params) error {
 	entries, err := fs.ReadDir(fsys, dirname)
 	if err != nil {
 		return err
@@ -62,7 +48,7 @@ func readEntries(fsys fs.FS, dirname string, params map[string]map[string]interf
 	return nil
 }
 
-func generate(t *template.Template, params interface{}, filename string) error {
+func generate(t *template.Template, params map[string]interface{}, filename string) error {
 	if len(filename) < 4 {
 		return errors.New("filename is too short")
 	}
@@ -75,7 +61,7 @@ func generate(t *template.Template, params interface{}, filename string) error {
 	return generateText(t, params, generateFile)
 }
 
-func generateText(t *template.Template, params interface{}, filename string) error {
+func generateText(t *template.Template, params map[string]interface{}, filename string) error {
 	var buf bytes.Buffer
 	t.Execute(&buf, params)
 
@@ -97,7 +83,7 @@ func generateText(t *template.Template, params interface{}, filename string) err
 	return nil
 }
 
-func generateGo(t *template.Template, params interface{}, filename string) error {
+func generateGo(t *template.Template, params map[string]interface{}, filename string) error {
 	var buf bytes.Buffer
 	t.Execute(&buf, params)
 

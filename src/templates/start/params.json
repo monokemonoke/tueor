@@ -1,8 +1,0 @@
-{
-    "test-go.mod.txt": {
-        "moduleName": "example.com/monokemonoke/hoge"
-    },
-    "main.go.txt": {
-        "message": "example.com/monokemonoke/hoge"
-    }
-}
