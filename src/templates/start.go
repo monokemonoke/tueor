@@ -1,14 +1,18 @@
-package src
+package templates
 
-import "embed"
+import (
+	"embed"
+
+	"github.com/monokemonoke/tueor/src"
+)
 
 var (
-	//go:embed templates/start/*
+	//go:embed start/*
 	Start embed.FS
 
-	StartDir = "templates/start"
+	StartDir = "start"
 
-	StartParams Params = Params{
+	StartParams src.Params = src.Params{
 		"go.mod.txt": {
 			"moduleName": "example.com/monokemonoke/hoge",
 		},
