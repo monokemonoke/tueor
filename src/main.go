@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"embed"
+	"encoding/json"
 	"html/template"
 	"io/fs"
 	"log"
@@ -10,8 +11,11 @@ import (
 )
 
 var (
-	//go:embed templates/helloworld/*
+	//go:embed templates/helloworld/templates/*
 	helloworld embed.FS
+
+	//go:embed templates/helloworld/params.json
+	helloworldParams []byte
 )
 
 func readEntries(fsys fs.FS, dirname string, params map[string]map[string]interface{}) error {
@@ -36,19 +40,16 @@ func readEntries(fsys fs.FS, dirname string, params map[string]map[string]interf
 }
 
 func main() {
-	fileSystem, err := fs.Sub(helloworld, "templates/helloworld")
+	fileSystem, err := fs.Sub(helloworld, "templates/helloworld/templates")
 	if err != nil {
 		log.Fatal(err)
 		return
 	}
 
-	params := map[string]map[string]interface{}{
-		"test-go.mod.txt": {
-			"moduleName": "example.com/monokemonoke/hoge",
-		},
-		"main.go.txt": {
-			"message": "example.com/monokemonoke/hoge",
-		},
+	var params map[string]map[string]interface{}
+	if err := json.Unmarshal(helloworldParams, &params); err != nil {
+		log.Fatal(err)
+		return
 	}
 
 	readEntries(fileSystem, ".", params)
